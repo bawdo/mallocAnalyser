@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <unistd.h>
 
 /*
  * The tool assumes: [MALLOC_DBG], as_id, file-name, function, line, size, ptr
@@ -64,7 +64,7 @@ static bucket *create_bucket(config *c, const unsigned int tok)
 
 	b->tok = tok;
 	sprintf(num,"%d", tok);
-	
+
 	strcat(file, num);
 	printf("%s: %s\n", "file is", file);
 
@@ -206,36 +206,48 @@ static void bucket_stream(char *filename,
 	clean_bucket_list (head);
 }
 
+#define MIN_ARG 4
+#define OPT "i:p:n:l:"
 int main(int argc, char *argv[])
 {
-	char string[] = "1,2,3,4";
-	char tmp[50] = "\0";
-	unsigned int tok = 0xFFFFFFFF;
-	bucket *b;
-	config c;
-	bucket *head = NULL;
+	int arg;
+	char *filename;
+	char *generate_path;
+	char *pref_filename;
+	char *delim_pos;
 
-	bucket_stream("gokul","./g", "hello_", "1");
-	
-#if 0
-	init_config("gokul", "./g", "hello_", "1", &c);
-
-	parse_tok(&c, tmp);
-
-	tok = atoi(tmp);
-
-	b = get_bucket(&c, head, tok);
-	if(!b) {
-		printf("Error\n");
-		exit(-1);
+	if(argc < 4) {
+		fprintf(stderr, "%s\n", "Enter the right args");
+		exit (-1);
 	}
-	append_bucket(b, string);
-	b = get_bucket(&c, head, tok);
-	append_bucket(b, string);
+	
+	while((arg = getopt(argc, argv, OPT)) != -1) {
+		switch(arg) {
 
-	clean_bucket_list(head);
-	printf("%s\n", PATH_SEP);
-	//printf("%s\n", tmp);
-#endif
+		case 'i':
+			filename = optarg;
+		break;
+
+		case 'p':
+			generate_path = optarg;
+		break;
+
+		case 'n':
+			pref_filename = optarg;
+		break;
+
+		case 'l':
+			delim_pos = optarg;
+		break;
+
+		default:
+			fprintf(stderr, "%s\n", "Wrong arg");
+			exit (-1);
+		break;
+		}
+	}
+
+	bucket_stream(filename, generate_path, pref_filename, delim_pos);
+
 	return 0;
 }
