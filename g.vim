@@ -125,8 +125,7 @@ setlocal matchpairs=(:),{:},[:]
 setlocal nomodeline
 setlocal modifiable
 setlocal nrformats=bin,hex
-set number
-setlocal number
+setlocal nonumber
 setlocal numberwidth=4
 setlocal omnifunc=ccomplete#Complete
 setlocal path=
@@ -168,12 +167,12 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 93 - ((19 * winheight(0) + 32) / 65)
+let s:l = 217 - ((28 * winheight(0) + 32) / 65)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-93
-normal! 032|
+217
+normal! 028|
 wincmd w
 argglobal
 if bufexists('malloc_analyser.c') | buffer malloc_analyser.c | else | edit malloc_analyser.c | endif
@@ -291,13 +290,14 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 25 - ((24 * winheight(0) + 32) / 65)
+let s:l = 35 - ((13 * winheight(0) + 32) / 65)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-25
-normal! 0
+35
+normal! 045|
 wincmd w
+2wincmd w
 exe 'vert 1resize ' . ((&columns * 104 + 104) / 208)
 exe 'vert 2resize ' . ((&columns * 103 + 104) / 208)
 tabnext 1
