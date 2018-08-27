@@ -61,8 +61,7 @@ struct  functionality {
 	void *data;
 };
 
-typedef struct _bucket {
-	unsigned long long tok;
+typedef struct _bucket {	unsigned long long tok;
 	FILE *fptr;
 	struct _bucket *nxt;
 }bucket;
@@ -261,8 +260,6 @@ static void bucket_stream(char *filename,
 		
 		tok = parse_tok(&c);
 		
-		printf("%lld\n", tok);
-#if 1
 		switch(c.derived_fun) {
 		case ANALYSE:
 		{
@@ -301,7 +298,6 @@ static void bucket_stream(char *filename,
 		if(c.derived_fun < MAX_FUNC) {
 			c.f(&c, c.fun);
 		}
-#endif
 #endif
 	}
 
@@ -352,6 +348,7 @@ int main(int argc, char *argv[])
 			filename = optarg;
 		break;
 
+	unsigned long long tok = 0xFFF;
 		case 'p':
 			generate_path = optarg;
 		break;
