@@ -1,20 +1,48 @@
 
 
-#include "malloc.h"
+#include <malloc.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
 
 typedef unsigned int Sensor;
-
 Sensor *replacePtr = NULL;
+typedef unsigned int MsgBuffer;
 
-void toggler(void)
+// [MALLOC_DBG] File, address-id, function, line, type, size, ptr
+
+#define my_malloc(size) (_my_malloc(__FILE__, __FUNCTION__, __LINE__, size))
+#define my_free(ptr) (_my_free(__FILE__, __FUNCTION__, __LINE__, ptr))
+
+static void *_my_malloc(const char *file, const char *function, unsigned int line, size_t size) 
 {
-   if (replacePtr != NULL) Free(replacePtr);
-   replacePtr = Malloc(sizeof(Sensor));
+	pid_t pid = getpid();
+	void *ptr = malloc(size);
+
+	fprintf(stdout, "[MALLOC_DBG] %d, %s, %s, %d, %ld, %d, %p\n", pid, file, function, line, size, 1, ptr);
+
+	return ptr;
+}
+
+static void _my_free(const char *file, const char *function, unsigned int line, void *ptr)
+{
+	pid_t pid = getpid();
+
+	fprintf(stdout, "[MALLOC_DBG] %d, %s, %s, %d, %d, %d, %p\n", pid, file, function, line, 0, 0, ptr);
+	free(ptr);
 }
 
 
-MsgBuffer *manyBuffers[30];
-int numBuf = 0;
+void toggler(void)
+{
+   if (replacePtr != NULL) my_free(replacePtr);
+   replacePtr = my_malloc(sizeof(Sensor));
+}
+
+static MsgBuffer  *manyBuffers[30];
+static int numBuf = 0;
 
 void growAndShrink(void)
 {
@@ -23,7 +51,7 @@ void growAndShrink(void)
       for (int i = 0; i < 5; i++)
       {
          numBuf--;
-         mFree(manyBuffers[numBuf]);
+         my_free(manyBuffers[numBuf]);
          manyBuffers[numBuf] = NULL;
       }
    }
@@ -31,20 +59,20 @@ void growAndShrink(void)
    {
       for (int i = 0; i < 5; i++)
       {
-         manyBuffers[numBuf] = malloc(sizeof(MsgBuffer));
+         manyBuffers[numBuf] = my_malloc(sizeof(MsgBuffer));
          numBuf++;
       }
    }
 }
 
-MsgBuffer *manyBadBuffers[200];
-int numBadBuf = 0;
+static MsgBuffer *manyBadBuffers[200];
+static int numBadBuf = 0;
 
 void growForever(void)
 {
    for (int i = 0; i < 5 ; i++)
    {
-      manyBadBuffers[numBadBuf] = malloc(sizeof(BadBuffer));
+      manyBadBuffers[numBadBuf] = my_malloc(sizeof(MsgBuffer));
       numBadBuf++;
    }
 }
@@ -57,11 +85,9 @@ int main(void)
 
    for (int i = 0; i < 10; i++)
    {
-      replacer();
       growAndShrink();
-      growForever();
-      printf("\n End of iteration %d", i);
-      mDisplayTable();
+      //growForever();
+      printf("End of iteration %d\n", i);
    }
 
    return 0;

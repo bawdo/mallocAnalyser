@@ -4,6 +4,10 @@
 #include <unistd.h>
 
 /*
+ * Maximum derived functionality the application will support
+ */
+#define MAX_FUNC 2
+/*
  * The tool assumes: [MALLOC_DBG], as_id, file-name, function, line, size, ptr
  */
 #define MAX_FILENAME (512)
@@ -22,12 +26,19 @@
 		MAX_FILENAME + MAX_FUNCTION_NAME + MAX_SEARCH_STRING + 		\
 		 (MAX_EACH_NONSTRING_FIELD * MAX_NONSTRING_FIELD_COUNT) + 	\
 		 (TOTAL_DELIMITER)						\
-		)								
+		)
 
-typedef struct _functionality {
-	unsigned int *(f) (config *c, functionality *diese);
-	unsigned long data; 
-} functionality;
+/* 
+ * FIXME: Functionality not now
+ * */
+typedef enum {
+	T_FREE = 0,
+	T_MALLOC,
+	T_ALLOC_MAX
+}alloc_type;
+
+struct functionality;
+
 typedef struct _config{
 	char *filename;
 	char *new_path;
@@ -38,15 +49,32 @@ typedef struct _config{
 
 	/* Add semantic to the bucketing, 
 	 * i.e., what additional functionality is expected on the process of buketing?*/
-	unsigned int additional_fun;
-	functionality *fun;
+	unsigned int derived_fun;
+	struct functionality *fun;
 }config;
+
+struct  functionality {
+	unsigned int (*init) (config *c, struct functionality *diese); 
+	unsigned int (*f) (config *c, struct functionality *diese);
+	unsigned int (*clean) (config *c, struct functionality *diese);
+	unsigned int pos;
+	void *data;
+};
 
 typedef struct _bucket {
 	unsigned long tok;
 	FILE *fptr;
 	struct _bucket *nxt;
 }bucket;
+
+typedef enum _function_type {
+	ANALYSE = 0,
+	STAT,
+	BUCKET,
+	FUN_MAX
+} function_type;
+
+struct functionality func[FUN_MAX] = { };
 
 static inline void append_bucket_list(bucket **head, bucket *node)
 {
@@ -129,7 +157,9 @@ static void clean_bucket_list(bucket *head)
 static void init_config(char *filename,
 			char *new_path,
 			char *pref_filename,
-			char *pos, 
+			char *pos,
+		        unsigned int fun,
+			unsigned int add_pos,	
 			config *c)
 {
 	memset(c, 0x00, sizeof(*c));
@@ -137,7 +167,20 @@ static void init_config(char *filename,
 	c->filename = filename;
 	c->new_path = new_path;
 	c->pos = atoi(pos);
-
+	
+	printf("Functionality : %d\n", fun);
+	c->derived_fun = fun;
+#if 0
+	/* FIXME: Needs a better invariance check*/
+	if(fun < BUCKET && fun >= 0) {
+		c->fun = &func[fun];
+		if(add_pos >= 0xFF) {
+			fprintf(stderr, "%s", "Wrong params for derived functionality\n");
+			exit (-1);
+		}
+		c->fun->pos = add_pos;
+	}
+#endif
 	strcpy(c->file_prepend, new_path);
 	strcat(c->file_prepend, PATH_SEP);
 	strcat(c->file_prepend, pref_filename);
@@ -148,6 +191,14 @@ static void init_config(char *filename,
 							"is not accessible");
 		exit(-1);
 	}
+}
+
+static void analyse_compute (config *c, signed int analysis)
+{
+	if(analysis) {
+		printf("possible leakage in: %s, leak count: %d\n", c->filename, analysis);
+	}
+	return;
 }
 
 static unsigned int get_nxt_line(config *c)
@@ -194,22 +245,70 @@ static unsigned long parse_tok(config *c)
 static void bucket_stream(char *filename,
 			  char *new_path,
 			  char *pref_filename,
-			  char *pos)
+			  char *pos,
+			  unsigned int func,
+			  unsigned int add_pos)
 {
 	config c;
 	bucket *head = NULL;
+	unsigned long tok = 0xFFFFFFFF;
+	signed long analyse = 0;
 
-	init_config(filename, new_path, pref_filename, pos, &c);
-
+	init_config(filename, new_path, pref_filename,
+		pos, func, add_pos, &c);
+	
 	while(get_nxt_line(&c)) {
-		bucket *b;
 		unsigned long tok = 0xFFFFFFFF;
-
+		
 		tok = parse_tok(&c);
-		b = get_bucket(&c, &head, tok);
-		append_bucket(b, c.per_line);
+
+		printf("%d\n", c.derived_fun);
+
+		switch(c.derived_fun) {
+		case ANALYSE:
+		{
+			unsigned int type = T_ALLOC_MAX;
+
+			if(T_FREE == tok) {
+				analyse--;
+			}
+			else if(T_MALLOC == tok) {
+				analyse++;
+			}
+			else {
+				fprintf(stderr, "%s\n", "Unknown alloc Functionality");
+				exit (-1);
+			}
+		}
+		break;
+		case STAT:
+			fprintf(stderr, "%s\n", "Functionality not implemented");
+			exit (-1);
+		break;
+		case BUCKET:
+		{
+			bucket *b;
+			//tok = parse_tok(&c);
+			b = get_bucket(&c, &head, tok);
+			append_bucket(b, c.per_line);
+		}
+		break;
+		default:
+			fprintf(stderr, "%s:%d\n", "Unknown Functionality", c.derived_fun);
+			exit (-1);
+		break;
+		}
+#if 0
+		if(c.derived_fun < MAX_FUNC) {
+			c.f(&c, c.fun);
+		}
+#endif
 	}
-	clean_bucket_list (head);
+
+	if(BUCKET == c.derived_fun)
+		clean_bucket_list (head);
+	else if(ANALYSE == c.derived_fun)
+		analyse_compute(&c, analyse);
 }
 
 /*
@@ -227,8 +326,8 @@ static void bucket_stream(char *filename,
  *
  */
 #define MIN_ARG 4
-#define MAX_FUNC 2
 #define OPT "i:p:n:l:o:a:"
+
 int main(int argc, char *argv[])
 {
 	int arg;
@@ -237,6 +336,7 @@ int main(int argc, char *argv[])
 	char *pref_filename;
 	char *delim_pos;
 	unsigned int functionality = 2; /*setting to default*/
+	unsigned int add_pos = 0xFFFFFFFF;
 
 	if(argc < MIN_ARG) {
 		fprintf(stderr, "%s\n", "Enter the right args");
@@ -270,14 +370,18 @@ int main(int argc, char *argv[])
 			}
 		break;
 
+		case 'a':
+			add_pos = atoi(optarg);
+		break;
+
 		default:
 			fprintf(stderr, "%s\n", "Wrong arg");
 			exit (-1);
 		break;
 		}
 	}
-
-	bucket_stream(filename, generate_path, pref_filename, delim_pos);
+	bucket_stream(filename, generate_path, pref_filename, 
+			delim_pos, functionality, add_pos);
 
 	return 0;
 }
