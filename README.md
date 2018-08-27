@@ -4,6 +4,11 @@ A simple Heap Analyser
 
 Author: Gokul Vasan
 
+Addresses two kind of memory leak:
+
+* Double malloc: same pointer is malloc assigned sequentially twice without a free in betweeen.
+* Forgotten Free: Malloced but forgotten.
+
 Warning: Its still is a lazy state, needs many potential improvements.
 
 Procedure:
