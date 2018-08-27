@@ -62,7 +62,7 @@ struct  functionality {
 };
 
 typedef struct _bucket {
-	unsigned long tok;
+	unsigned long long tok;
 	FILE *fptr;
 	struct _bucket *nxt;
 }bucket;
@@ -82,10 +82,10 @@ static inline void append_bucket_list(bucket **head, bucket *node)
 	*head = node;
 }
 
-static bucket *create_bucket(config *c, const unsigned int tok)
+static bucket *create_bucket(config *c, const unsigned long long tok)
 {
 	bucket *b = NULL;
-	char num[10];
+	char num[50];
 	char file[MAX_FILENAME];
 
 	strcpy(file, c->file_prepend);
@@ -97,10 +97,10 @@ static bucket *create_bucket(config *c, const unsigned int tok)
 	}
 
 	b->tok = tok;
-	sprintf(num,"%d", tok);
+	sprintf(num,"%lld", tok);
 
 	strcat(file, num);
-	printf("%s: %s\n", "file is", file);
+	// printf("%s: %s\n", "file is", file);
 
 	b->fptr = fopen(file, "w");
 	if(!b->fptr) {
@@ -110,7 +110,7 @@ static bucket *create_bucket(config *c, const unsigned int tok)
 	b->nxt = NULL;
 }
 
-static bucket *check_bucket(bucket **head, const unsigned int tok)
+static bucket *check_bucket(bucket **head, const unsigned long long tok)
 {
 	bucket *iter = *head;
 
@@ -124,7 +124,7 @@ static bucket *check_bucket(bucket **head, const unsigned int tok)
 	return iter;
 }
 
-static bucket *get_bucket(config *c, bucket **head, const unsigned int tok)
+static bucket *get_bucket(config *c, bucket **head, const unsigned long long tok)
 {
 	bucket *b;
 
@@ -138,7 +138,7 @@ static bucket *get_bucket(config *c, bucket **head, const unsigned int tok)
 
 static void append_bucket(bucket *b, char *str)
 {
-	printf("AFTER: %s", str);
+	//printf("AFTER: %s", str);
 	fprintf(b->fptr, "%s", str);
 }
 
@@ -168,7 +168,7 @@ static void init_config(char *filename,
 	c->new_path = new_path;
 	c->pos = atoi(pos);
 	
-	printf("Functionality : %d\n", fun);
+	//printf("Functionality : %d\n", fun);
 	c->derived_fun = fun;
 #if 0
 	/* FIXME: Needs a better invariance check*/
@@ -205,7 +205,7 @@ static unsigned int get_nxt_line(config *c)
 {
 	if(!(fgets(c->per_line, STR_MAX, c->fd)) )
 		return 0;
-	printf("%s", c->per_line);
+	//printf("%s", c->per_line);
 	return 1;
 }
 
@@ -215,7 +215,7 @@ static unsigned int get_nxt_line(config *c)
 static unsigned long parse_tok(config *c)
 {
 	unsigned int pos = c->pos;
-	char tok[MAX_EACH_NONSTRING_FIELD];
+	char tok[MAX_FILENAME];
 	char *tmp = c->per_line;
 	unsigned long t;
 	unsigned int i = 0;
@@ -242,6 +242,8 @@ static unsigned long parse_tok(config *c)
  * Main function that will bucket the captured stream
  * based on the input request.
  */
+static config c;
+static bucket *head = NULL;
 static void bucket_stream(char *filename,
 			  char *new_path,
 			  char *pref_filename,
@@ -249,21 +251,18 @@ static void bucket_stream(char *filename,
 			  unsigned int func,
 			  unsigned int add_pos)
 {
-	config c;
-	bucket *head = NULL;
-	unsigned long tok = 0xFFFFFFFF;
 	signed long analyse = 0;
 
 	init_config(filename, new_path, pref_filename,
 		pos, func, add_pos, &c);
-	
+
 	while(get_nxt_line(&c)) {
-		unsigned long tok = 0xFFFFFFFF;
+		unsigned long long tok = 0xFFF;
 		
 		tok = parse_tok(&c);
-
-		printf("%d\n", c.derived_fun);
-
+		
+		printf("%lld\n", tok);
+#if 1
 		switch(c.derived_fun) {
 		case ANALYSE:
 		{
@@ -303,12 +302,15 @@ static void bucket_stream(char *filename,
 			c.f(&c, c.fun);
 		}
 #endif
+#endif
 	}
 
 	if(BUCKET == c.derived_fun)
 		clean_bucket_list (head);
 	else if(ANALYSE == c.derived_fun)
 		analyse_compute(&c, analyse);
+
+
 }
 
 /*
@@ -326,7 +328,7 @@ static void bucket_stream(char *filename,
  *
  */
 #define MIN_ARG 4
-#define OPT "i:p:n:l:o:a:"
+#define OPT "i:p:n:l:o:"
 
 int main(int argc, char *argv[])
 {
@@ -336,12 +338,12 @@ int main(int argc, char *argv[])
 	char *pref_filename;
 	char *delim_pos;
 	unsigned int functionality = 2; /*setting to default*/
-	unsigned int add_pos = 0xFFFFFFFF;
+	unsigned int add_pos = 0xFFF;
 
-	if(argc < MIN_ARG) {
-		fprintf(stderr, "%s\n", "Enter the right args");
-		exit (-1);
-	}
+	//if(argc < MIN_ARG) {
+	//	fprintf(stderr, "%s\n", "Enter the right args");
+	//	exit (-1);
+	//}
 
 	while((arg = getopt(argc, argv, OPT)) != -1) {
 		switch(arg) {
@@ -369,17 +371,18 @@ int main(int argc, char *argv[])
 				exit (-1);
 			}
 		break;
-
+/*
 		case 'a':
 			add_pos = atoi(optarg);
 		break;
-
+*/
 		default:
 			fprintf(stderr, "%s\n", "Wrong arg");
 			exit (-1);
 		break;
 		}
 	}
+	//printf("%d\n", STR_MAX);
 	bucket_stream(filename, generate_path, pref_filename, 
 			delim_pos, functionality, add_pos);
 

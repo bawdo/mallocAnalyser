@@ -21,7 +21,7 @@ static void *_my_malloc(const char *file, const char *function, unsigned int lin
 	pid_t pid = getpid();
 	void *ptr = malloc(size);
 
-	fprintf(stdout, "[MALLOC_DBG] %d, %s, %s, %d, %ld, %d, %p\n", pid, file, function, line, size, 1, ptr);
+	fprintf(stdout, "[MALLOC_DBG], %d, %s, %s, %ld, %ld, %ld, %ld\n", pid, file, function, line, size, 1, ptr);
 
 	return ptr;
 }
@@ -30,7 +30,7 @@ static void _my_free(const char *file, const char *function, unsigned int line, 
 {
 	pid_t pid = getpid();
 
-	fprintf(stdout, "[MALLOC_DBG] %d, %s, %s, %d, %d, %d, %p\n", pid, file, function, line, 0, 0, ptr);
+	fprintf(stdout, "[MALLOC_DBG], %d, %s, %s, %ld, %ld, %ld, %ld\n", pid, file, function, line, 0, 0, ptr);
 	free(ptr);
 }
 
