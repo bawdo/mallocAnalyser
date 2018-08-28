@@ -8,8 +8,8 @@ Author: Gokul Vasan
 
 Addresses two kind of memory leak:
 
-* Double malloc: same pointer is malloc assigned sequentially twice without a free in betweeen.
-* Forgotten Free: Malloced but forgotten.
+* **Double malloc:** same pointer is malloc assigned sequentially twice without a free in betweeen.
+* **Forgotten Free:** Malloced but forgotten.
 
 Warning: Its still a lazy implementation, needs many potential improvements.
 
