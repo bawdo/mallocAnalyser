@@ -26,7 +26,32 @@ Malloc trace should be in the format:
 	
 What will this spit:
 --------------------
-	* File locations containing the traces where the potential leak should be.
+	* The possible locations of the leak.
+```
+
+Possible Leaks in:
+[MALLOC_DBG], 10638, test.c, growAndShrink, 62, 4, 1, 94186296386144
+[MALLOC_DBG], 10638, test.c, growAndShrink, 62, 4, 1, 94186296390288
+[MALLOC_DBG], 10638, test.c, growAndShrink, 62, 4, 1, 94186296390320
+[MALLOC_DBG], 10638, test.c, growAndShrink, 62, 4, 1, 94186296390352
+[MALLOC_DBG], 10638, test.c, growAndShrink, 62, 4, 1, 94186296390384
+[MALLOC_DBG], 10638, test.c, growAndShrink, 62, 4, 1, 94186296390416
+[MALLOC_DBG], 10638, test.c, growAndShrink, 62, 4, 1, 94186296390448
+[MALLOC_DBG], 10638, test.c, growAndShrink, 62, 4, 1, 94186296390480
+[MALLOC_DBG], 10638, test.c, growAndShrink, 62, 4, 1, 94186296390512
+[MALLOC_DBG], 10638, test.c, growAndShrink, 62, 4, 1, 94186296390544
+[MALLOC_DBG], 10638, test.c, growAndShrink, 62, 4, 1, 94186296390576
+[MALLOC_DBG], 10638, test.c, growAndShrink, 62, 4, 1, 94186296390608
+[MALLOC_DBG], 10638, test.c, growAndShrink, 62, 4, 1, 94186296390640
+[MALLOC_DBG], 10638, test.c, growAndShrink, 62, 4, 1, 94186296390672
+[MALLOC_DBG], 10638, test.c, growAndShrink, 62, 4, 1, 94186296390704
+[MALLOC_DBG], 10638, test.c, growAndShrink, 62, 4, 1, 94186296390736
+[MALLOC_DBG], 10638, test.c, growAndShrink, 62, 4, 1, 94186296390768
+[MALLOC_DBG], 10638, test.c, growAndShrink, 62, 4, 1, 94186296390800
+[MALLOC_DBG], 10638, test.c, growAndShrink, 62, 4, 1, 94186296390832
+[MALLOC_DBG], 10638, test.c, growAndShrink, 62, 4, 1, 94186296390864
+
+```
 	
 TODO:
 ------
