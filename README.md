@@ -9,7 +9,7 @@ Addresses two kind of memory leak:
 * Double malloc: same pointer is malloc assigned sequentially twice without a free in betweeen.
 * Forgotten Free: Malloced but forgotten.
 
-Warning: Its still is a lazy state, needs many potential improvements.
+Warning: Its still a lazy implementation, needs many potential improvements.
 
 Procedure:
 -----------
@@ -18,7 +18,7 @@ Procedure:
 	
 Malloc trace should be in the format:
 -------------------------------------
-	*[MALLOC_DBG], File, address-id, function, line, type, size, ptr
+	*[MALLOC_DBG], address-id, file, function, line, type, size, ptr
 	
 What will this spit:
 --------------------
