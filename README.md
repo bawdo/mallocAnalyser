@@ -18,7 +18,7 @@ Procedure:
 	
 Malloc trace should be in the format:
 -------------------------------------
-	*[MALLOC_DBG], File, address-id, function, line, type, size, ptr
+	*[MALLOC_DBG], address-id, file, function, line, type, size, ptr
 	
 What will this spit:
 --------------------
