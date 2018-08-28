@@ -195,7 +195,8 @@ static void init_config(char *filename,
 static void analyse_compute (config *c, signed int analysis)
 {
 	if(analysis) {
-		printf("possible leakage in: %s, leak count: %d\n", c->filename, analysis);
+		fprintf(stdout, "%s\n", c->filename);
+		//fprintf(stdout, "possible leakage in: %s, leak count: %d\n", c->filename, analysis);
 	}
 	return;
 }

@@ -7,6 +7,10 @@ PROCESS="pid_"
 PROCESS_FILES=${DIR}/${PROCESS}
 PTR="ptr_"
 DIR1="_dir"
+LEAK_FILE="leak_file.txt"
+
+
+
 if [ -d $DIR ]; then
 	rm -rf $DIR
 fi
@@ -29,8 +33,10 @@ for f in ${PROCESS_FILES}* ; do
 	if [ -d $f ]; then
 		for j in $f/*; do
 			#echo "processing the $j"
-			./malloc_analyser -i ${j} -l 6 -o 0
+			./malloc_analyser -i ${j} -l 6 -o 0 >> ${DIR}/${LEAK_FILE}
 		done
 	fi
 done
 
+echo "Possible Leaks in:"
+cat ${DIR}/${LEAK_FILE} | xargs cat
