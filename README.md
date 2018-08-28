@@ -2,6 +2,8 @@
 A simple Heap Analyser
 ---------------------
 
+![picture alt](https://github.com/gokulvasan/mallocAnalyser/blob/master/DonaldThePlumber.jpg "Leak Fixer")
+
 Author: Gokul Vasan
 
 Addresses two kind of memory leak:
@@ -18,7 +20,9 @@ Procedure:
 	
 Malloc trace should be in the format:
 -------------------------------------
-	*[MALLOC_DBG], address-id, file, function, line, type, size, ptr
+	* [MALLOC_DBG], address-id, file, function, line, type, size, ptr
+	* The variables should be %lld. 
+	* please refer the test.c's my_malloc and my_free for reference.
 	
 What will this spit:
 --------------------
