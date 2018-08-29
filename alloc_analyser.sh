@@ -1,6 +1,7 @@
 #! /usr/bin/env bash
 
-SEARCH="[MALLOC_DBG]"
+SEARCH_STRING="MALLOC_DBG"
+SEARCH="["${SEARCH_STRING}"]"
 DIR="./tmp"
 LEVEL_ONE="gen.txt"
 PROCESS="pid_"
@@ -17,7 +18,7 @@ fi
 
 mkdir $DIR
 
-cat $1 | grep $SEARCH > ${DIR}/${LEVEL_ONE}
+cat $1 | grep $SEARCH | grep $SEARCH_STRING 1>${DIR}/${LEVEL_ONE} 2>/dev/null
 
 # segregate based on process id
 ./malloc_analyser -i ${DIR}/${LEVEL_ONE} -p ${DIR} -n ${PROCESS} -l 1 -o 2
