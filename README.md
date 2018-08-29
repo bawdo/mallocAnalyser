@@ -58,6 +58,7 @@ TODO:
 	* Improve speed.
 	* Add statistics functionality.
 	* Add Temporal sequencing.
+	* Use size as one among the delimiter, enabling reduced search space.
 
 please refer the test.c's my_malloc and my_free for reference.
 
