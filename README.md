@@ -4,7 +4,7 @@ A simple Heap Analyser
 
 ![picture alt](https://github.com/gokulvasan/mallocAnalyser/blob/master/DonaldThePlumber.jpg "Leak Fixer")
 
-Author: Gokul Vasan
+**Author:** Gokul Vasan
 
 Addresses two kind of memory leak:
 
