@@ -27,6 +27,7 @@ Malloc trace should be in the format:
 What will this spit:
 --------------------
 	* The possible locations of the leak.
+	* legend: [MALLOC_DBG], address-id, file, function, line, size, type, ptr
 ```
 
 Possible Leaks in:
