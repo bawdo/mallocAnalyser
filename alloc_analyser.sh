@@ -50,7 +50,7 @@ for f in ${PROCESS_FILES}* ; do
 		#echo $f
 		mkdir ${f}/${SIZE_BASED_DIR}${DIR1}
 		for j in $f/*; do
-			./malloc_analyser -i ${j} -p ${f}/${SIZE_BASED_DIR}${DIR1} -n ${SIZE_FILE} -l ${SIZE_LOCATION} -o ${OPERATION_BUCKET} 
+			./malloc_analyser -i ${j} -p ${f}/${SIZE_BASED_DIR}${DIR1} -n ${SIZE_FILE}${f} -l ${SIZE_LOCATION} -o ${OPERATION_BUCKET} 
 		done
 	fi
 done
